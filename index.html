@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MC Wilber | Event host, emcee &amp; hype man</title>
+<meta name="description" content="MC Wilber hosts weddings, corporate events, concerts and parties. Check dates and book online.">
+<meta property="og:title" content="MC Wilber | Event host &amp; emcee">
+<meta property="og:description" content="Book MC Wilber for your next event.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎤</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#171233;--bg2:#211a47;--ink:#f6f1ff;--mute:#b9b0d9;--hot:#ff4f7b;--gold:#ffc857;--line:#3a3070;--r:14px}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font:17px/1.6 'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:'Bowlby One','Impact',sans-serif;font-weight:400;line-height:1.05}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+section{padding:88px 0}
+h2{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:12px}
+.lede{color:var(--mute);max-width:56ch;margin-bottom:36px}
+.btn{display:inline-block;background:var(--hot);color:#fff;font-weight:700;border:0;border-radius:999px;padding:14px 28px;cursor:pointer;text-decoration:none;font-size:1rem}
+.btn.alt{background:transparent;border:2px solid var(--gold);color:var(--gold)}
+.btn:hover{filter:brightness(1.1)}
+/* nav */
+header{position:sticky;top:0;z-index:20;background:rgba(23,18,51,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+nav .logo{font-family:'Bowlby One';text-decoration:none;font-size:1.2rem}
+nav ul{display:flex;gap:22px;list-style:none;padding:0}
+nav ul a{text-decoration:none;color:var(--mute);font-size:.95rem}
+nav ul a:hover{color:var(--ink)}
+#menu{display:none;background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 12px}
+/* hero */
+.hero{position:relative;min-height:88vh;display:grid;align-items:center;overflow:hidden;padding:60px 0;
+ background:radial-gradient(circle 340px at var(--x,70%) var(--y,30%),rgba(255,200,87,.38),transparent 70%),var(--bg)}
+.hero h1{font-size:clamp(4.2rem,17vw,12rem);letter-spacing:-.02em}
+.hero h1 span{display:block;color:transparent;-webkit-text-stroke:2px var(--hot)}
+.hero p{font-size:1.25rem;max-width:34ch;margin:20px 0 30px;color:var(--mute)}
+.hero .row{display:flex;gap:14px;flex-wrap:wrap}
+.stats{display:flex;gap:36px;flex-wrap:wrap;margin-top:44px;color:var(--mute)}
+.stats b{display:block;color:var(--gold);font-size:1.6rem}
+/* grids */
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.card h3{font-size:1.2rem;margin-bottom:8px;color:var(--gold)}
+.card p{color:var(--mute);font-size:.97rem}
+.about{display:grid;gap:40px;grid-template-columns:1fr 1.3fr;align-items:center}
+.photo{aspect-ratio:4/5;border-radius:var(--r);background:linear-gradient(160deg,var(--hot),#6d3df2);display:grid;place-items:center;font-size:6rem}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.tags span{border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:.9rem;color:var(--mute)}
+/* events */
+.ev{display:flex;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.ev time{min-width:64px;text-align:center;background:var(--gold);color:#241a00;border-radius:10px;padding:6px;font-weight:700;line-height:1.2}
+.ev time small{display:block;font-weight:500}
+.ev em{color:var(--mute);font-style:normal;display:block;font-size:.93rem}
+/* video / gallery */
+.vid{aspect-ratio:16/9;border:0;border-radius:var(--r);width:100%;background:var(--bg2);display:grid;place-items:center;color:var(--ink);cursor:pointer;font-size:1rem}
+.vid iframe{width:100%;height:100%;border:0;border-radius:var(--r)}
+.gal{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.gal div{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:2.4rem;background:var(--bg2);border:1px solid var(--line)}
+blockquote{background:var(--bg2);border-left:4px solid var(--hot);padding:20px;border-radius:0 var(--r) var(--r) 0}
+blockquote cite{display:block;margin-top:10px;color:var(--gold);font-style:normal;font-size:.9rem}
+details{border-bottom:1px solid var(--line);padding:14px 0}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--mute);margin-top:8px}
+/* form */
+form{display:grid;gap:14px;grid-template-columns:1fr 1fr;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:28px}
+form .full{grid-column:1/-1}
+label{display:grid;gap:6px;font-size:.92rem;color:var(--mute)}
+input,select,textarea{font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px}
+#msg{grid-column:1/-1;min-height:1.4em;font-weight:700}
+.ok{color:#6ee7a8}.err{color:var(--hot)}
+footer{border-top:1px solid var(--line);padding:36px 0 90px;color:var(--mute)}
+footer .soc{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.sticky{display:none;position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:var(--bg);border-top:1px solid var(--line);z-index:15}
+.sticky .btn{width:100%;text-align:center}
+@media(max-width:760px){
+ #menu{display:block}
+ nav ul{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:var(--bg);padding:16px 20px;border-bottom:1px solid var(--line)}
+ nav ul.open{display:flex}
+ .about,form{grid-template-columns:1fr}
+ .sticky{display:block}
+ section{padding:60px 0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.top{background:var(--hot);color:#fff;font-size:.88rem}
+.top .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:6px 20px}
+.top a{text-decoration:none;font-weight:700}
+nav ul .btn{padding:8px 20px;color:#fff}
+.hgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center}
+.hv{position:relative}.hv .photo{aspect-ratio:3/4;font-size:8rem;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.badge{position:absolute;background:var(--gold);color:#241a00;font-weight:700;padding:8px 16px;border-radius:999px;font-size:.9rem;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.b1{top:8%;left:-6%}.b2{bottom:10%;right:-4%}
+.card{transition:transform .2s,border-color .2s}.card:hover{transform:translateY(-4px);border-color:var(--hot)}
+.price{font-size:2rem;font-family:'Bowlby One';margin:6px 0 12px}
+.price small{font:400 .9rem 'DM Sans';color:var(--mute)}
+.card ul{list-style:none;padding:0;margin:0 0 18px;color:var(--mute);font-size:.95rem}
+.card li::before{content:"✓ ";color:var(--gold)}
+.card.pop{border:2px solid var(--gold);position:relative}
+.card.pop::after{content:"Most booked";position:absolute;top:-13px;right:18px;background:var(--gold);color:#241a00;font-size:.8rem;font-weight:700;padding:2px 12px;border-radius:999px}
+.steps{counter-reset:s}.steps .card::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--hot);font-weight:700;margin-bottom:12px}
+.cal{max-width:420px;margin-bottom:28px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.cal header{position:static;display:flex;justify-content:space-between;align-items:center;background:none;border:0;margin-bottom:10px}
+.cal header button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:34px;height:34px;cursor:pointer}
+#calg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+#calg b{color:var(--mute);font-size:.8rem}
+#calg button{aspect-ratio:1;border:0;border-radius:8px;background:#2c2459;color:var(--ink);cursor:pointer;font:inherit}
+#calg button:hover:not(:disabled){background:var(--gold);color:#241a00}
+#calg button:disabled{opacity:.3;cursor:not-allowed}#calg button.bz{background:var(--hot);opacity:.7}
+.legend{font-size:.82rem;color:var(--mute);margin-top:8px}
+.fcols{display:grid;gap:32px;grid-template-columns:1.4fr 1fr 1fr 1.4fr;margin-bottom:28px}
+.fcols h4{color:var(--ink);margin-bottom:10px}.fcols a{display:block;text-decoration:none;margin:4px 0}.fcols a:hover{color:var(--gold)}
+#nl{display:flex;gap:8px}#nl input{flex:1;min-width:0}
+.fab{position:fixed;right:16px;bottom:84px;z-index:16;display:grid;gap:10px}
+.fab a{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#25d366;color:#fff;text-decoration:none;font-size:1.4rem;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.fab a.up{background:var(--bg2);border:1px solid var(--line)}
+@media(max-width:760px){.hgrid,.fcols{grid-template-columns:1fr}.hv{max-width:260px}.b1{left:0}.b2{right:0}.top .wrap span{display:none}}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"EntertainmentBusiness","name":"MC Wilber","description":"Event host, emcee and hype man","email":"danestitconsult@gmail.com","areaServed":"Ghana"}</script>
+</head>
+<body>
+<div class="top"><div class="wrap"><span>Now booking 2026 &amp; 2027 events</span><a href="mailto:danestitconsult@gmail.com">danestitconsult@gmail.com</a></div></div>
+<header><div class="wrap"><nav aria-label="Main">
+ <a class="logo" href="#top">MC WILBER</a>
+ <button id="menu" aria-expanded="false" aria-controls="links">Menu</button>
+ <ul id="links">
+  <li><a href="#about">About</a></li><li><a href="#services">Services</a></li><li><a href="#packages">Packages</a></li><li><a href="#events">Events</a></li>
+  <li><a href="#watch">Watch</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#faq">FAQ</a></li><li><a class="btn" href="#book">Book now</a></li>
+ </ul></nav></div></header>
+
+<main id="top">
+<section class="hero" id="hero"><div class="wrap hgrid"><div>
+ <h1>MC<span>Wilber</span></h1>
+ <p>The host who keeps your room loud, your timeline tight, and your guests talking about it for years.</p>
+ <div class="row"><a class="btn" href="#book">Check my date</a><a class="btn alt" href="#watch">Watch a reel</a></div>
+ <div class="stats"><div><b>400+</b>events hosted</div><div><b>3</b>languages</div><div><b>48 hrs</b>reply time</div></div></div>
+ <div class="hv"><div class="photo" role="img" aria-label="MC Wilber photo placeholder">🎤</div><span class="badge b1">⭐ 5.0 rated</span><span class="badge b2">🎉 400+ events</span></div>
+</div></section>
+
+<section id="about"><div class="wrap about">
+ <div class="photo" role="img" aria-label="Photo of MC Wilber (replace with your own)">🎤</div>
+ <div><h2>Hi, I'm Wilber.</h2>
+ <p class="lede">I've held the mic at weddings, product launches, concerts and street festivals. I read the room, set the pace, and make sure every speech, song and surprise lands on time.</p>
+ <p>Replace this text with your own story, your years of experience, and what makes your hosting different.</p>
+ <div class="tags"><span>English</span><span>Twi</span><span>Ga</span><span>Live crowd work</span><span>Own sound gear</span></div></div>
+</div></section>
+
+<section id="services" style="background:var(--bg2)"><div class="wrap">
+ <h2>What I host</h2><p class="lede">Every package includes a planning call and a run-of-show sheet.</p>
+ <div class="grid" id="svc"></div>
+</div></section>
+
+<section id="packages"><div class="wrap">
+ <h2>Packages</h2><p class="lede">Clear starting prices. Every event is quoted after a short call.</p>
+ <div class="grid" id="pk"></div>
+ <h3 style="margin:56px 0 18px;font-size:1.5rem">How booking works</h3>
+ <div class="grid steps" id="st"></div>
+</div></section>
+
+<section id="events"><div class="wrap">
+ <h2>Upcoming events</h2><p class="lede">Come say hello. Public gigs are listed here.</p>
+ <div id="evlist" aria-live="polite">Loading events…</div>
+</div></section>
+
+<section id="watch" style="background:var(--bg2)"><div class="wrap">
+ <h2>Watch me work</h2><p class="lede">Highlights from recent events.</p>
+ <div class="grid" id="vids"></div>
+ <h3 style="margin:48px 0 16px;font-size:1.4rem">Gallery</h3>
+ <div class="gal" id="gal"></div>
+</div></section>
+
+<section id="reviews"><div class="wrap">
+ <h2>Kind words</h2><p class="lede">From the couples and teams I've hosted.</p>
+ <div class="grid" id="rev"></div>
+</div></section>
+
+<section id="book" style="background:var(--bg2)"><div class="wrap">
+ <h2>Book MC Wilber</h2><p class="lede">Pick your date first. I'll tell you if it's open, then confirm within 48 hours.</p>
+ <div class="cal"><header><button type="button" id="cp" aria-label="Previous month">‹</button><strong id="calt"></strong><button type="button" id="cn" aria-label="Next month">›</button></header>
+  <div id="calg"></div><p class="legend">Tap an open day to select it. Red days are taken.</p></div>
+ <form id="bf" novalidate>
+  <label>Your name<input name="name" required autocomplete="name"></label>
+  <label>Email<input name="email" type="email" required autocomplete="email"></label>
+  <label>Phone / WhatsApp<input name="phone" type="tel" autocomplete="tel"></label>
+  <label>Event type<select name="type" id="typeSel"></select></label>
+  <label>Event date<input name="date" id="date" type="date" required></label>
+  <label>Guests (approx.)<input name="guests" type="number" min="1" max="20000"></label>
+  <label class="full">Venue / city<input name="venue"></label>
+  <label class="full">Tell me about the event<textarea name="notes" rows="4"></textarea></label>
+  <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+  <p id="avail" class="full" aria-live="polite"></p>
+  <button class="btn full" id="send" type="submit">Send booking request</button>
+  <p id="msg" role="status"></p>
+ </form>
+</div></section>
+
+<section id="faq"><div class="wrap">
+ <h2>Questions</h2><div id="faqs" style="margin-top:20px"></div>
+ <p style="margin-top:28px"><a class="btn alt" href="#" id="kit">Download press kit</a></p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+ <div class="soc" id="soc"></div>
+ <div class="fcols">
+  <div><h4>MC Wilber</h4><p>Event host and emcee for weddings, corporate events, concerts and parties.</p></div>
+  <div><h4>Explore</h4><a href="#about">About</a><a href="#packages">Packages</a><a href="#watch">Watch</a><a href="#faq">FAQ</a></div>
+  <div><h4>Contact</h4><a href="mailto:danestitconsult@gmail.com">danestitconsult@gmail.com</a><a href="https://wa.me/233000000000">WhatsApp</a><a href="#book">Booking form</a></div>
+  <div><h4>Get event tips</h4><form id="nl" style="display:flex;padding:0;background:none;border:0"><input type="email" name="email" required placeholder="Your email" aria-label="Email"><button class="btn" style="padding:10px 18px">Join</button></form><p id="nlm" role="status" style="margin-top:6px"></p></div>
+ </div>
+ <p>© <span id="yr"></span> MC Wilber. All rights reserved.</p>
+</div></footer>
+<div class="fab"><a href="https://wa.me/233000000000" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a><a class="up" href="#top" aria-label="Back to top">↑</a></div>
+<div class="sticky"><a class="btn" href="#book">Check my date</a></div>
+
+<script type="module">
+/* ============ EDIT ME ============ */
+const SITE = {
+  email: "danestitconsult@gmail.com",
+  whatsapp: "233000000000",
+  pressKit: "",   // e.g. "press-kit.pdf" placed next to index.html
+  socials: [["Instagram","https://instagram.com/"],["YouTube","https://youtube.com/"],["TikTok","https://tiktok.com/"],["Facebook","https://facebook.com/"],["WhatsApp","https://wa.me/233000000000"]],
+  services: [
+   ["Weddings","Introductions, games, toasts and a flowing reception."],
+   ["Corporate events","Launches, galas and award nights, on script and on brand."],
+   ["Concerts & festivals","Hype, crowd control and artist handovers."],
+   ["Birthdays & parties","Energy, music requests and surprise moments."],
+   ["Conferences","Panel moderation and clean transitions."],
+   ["Funerals & memorials","Calm, respectful and well-paced."]],
+  videos: [], // add YouTube IDs, e.g. ["dQw4w9WgXcQ","Wedding reel"]
+  gallery: ["💍","🎉","🎤","🏆","🎶","🥂","📸","🔥"],
+  reviews: [
+   ["He kept 300 guests on the dance floor all night.","Ama & Kofi, wedding"],
+   ["Professional, on time, and the CEO loved him.","Events lead, fintech launch"],
+   ["Best host we've booked for our festival.","Festival organiser"]],
+  faqs: [
+   ["How far ahead should I book?","As early as you can. Peak months fill 3 to 6 months out."],
+   ["Do you bring sound equipment?","Yes, on request. Say so in the form and I'll quote it."],
+   ["Do you travel?","Yes. Travel and stay are added to the quote."],
+   ["How do I secure my date?","A deposit after you accept the quote. Your date is held once it's paid."]],
+  fallbackEvents: [] // [{title,date:"2026-12-05",place:"Accra"}]
+};
+const FIREBASE = {
+  apiKey: "AIzaSyCWFhEOBfrm372DzpATu24gone0KxQ_mEE",
+  authDomain: "mc-wilber.firebaseapp.com",
+  projectId: "mc-wilber",
+  storageBucket: "mc-wilber.firebasestorage.app",
+  messagingSenderId: "1077090036961",
+  appId: "1:1077090036961:web:f37547c21fcf98f8235ba0"
+}; // paste from Firebase console
+/* ================================== */
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('#yr').textContent = new Date().getFullYear();
+
+/* render static content */
+$('#svc').innerHTML = SITE.services.map(([t,d])=>`<div class="card"><h3>${esc(t)}</h3><p>${esc(d)}</p></div>`).join('');
+$('#typeSel').innerHTML = SITE.services.map(([t])=>`<option>${esc(t)}</option>`).join('')+'<option>Other</option>';
+$('#gal').innerHTML = SITE.gallery.map(g=>`<div aria-hidden="true">${g}</div>`).join('');
+$('#rev').innerHTML = SITE.reviews.map(([q,a])=>`<blockquote>${esc(q)}<cite>${esc(a)}</cite></blockquote>`).join('');
+$('#faqs').innerHTML = SITE.faqs.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
+$('#soc').innerHTML = SITE.socials.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('');
+$('#vids').innerHTML = SITE.videos.length ? SITE.videos.map(([id,t])=>`<button class="vid" data-id="${esc(id)}" aria-label="Play ${esc(t)}">▶ ${esc(t)}</button>`).join('')
+  : '<div class="card"><p>Add YouTube IDs to <code>SITE.videos</code> in index.html to show your reels here.</p></div>';
+document.querySelectorAll('.vid').forEach(b=>b.onclick=()=>{b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1" allow="autoplay;encrypted-media;fullscreen" title="Video"></iframe>`});
+if(SITE.pressKit) $('#kit').href = SITE.pressKit; else $('#kit').onclick = e=>{e.preventDefault();location.href=`mailto:${SITE.email}?subject=Press kit request`};
+
+/* nav + spotlight */
+$('#menu').onclick = e=>{const o=$('#links').classList.toggle('open');e.target.setAttribute('aria-expanded',o)};
+$('#links').onclick = ()=>$('#links').classList.remove('open');
+const hero=$('#hero');
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)
+  hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();hero.style.setProperty('--x',e.clientX-r.left+'px');hero.style.setProperty('--y',e.clientY-r.top+'px')});
+
+/* events */
+const fmt = d => { const t=new Date(d+'T00:00'); return `<time datetime="${d}">${t.getDate()}<small>${t.toLocaleString('en',{month:'short'})}</small></time>`; };
+const drawEvents = list => {
+  const today = new Date().toISOString().slice(0,10);
+  const up = list.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  $('#evlist').innerHTML = up.length ? up.map(e=>`<div class="ev">${fmt(e.date)}<div><strong>${esc(e.title)}</strong><em>${esc(e.place||'')}</em></div></div>`).join('')
+    : '<p style="color:var(--mute)">No public shows right now. Private bookings are open, so check your date below.</p>';
+};
+drawEvents(SITE.fallbackEvents);
+
+/* firebase (optional until configured) */
+let db=null, fs=null, booked=new Set();
+const today = new Date().toISOString().slice(0,10);
+$('#date').min = today;
+if (FIREBASE.projectId) {
+  try {
+    const app = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    db = fs.getFirestore(app.initializeApp(FIREBASE));
+    const ev = await fs.getDocs(fs.query(fs.collection(db,'events'),fs.where('date','>=',today),fs.orderBy('date')));
+    drawEvents(ev.docs.map(d=>d.data()));
+    const bk = await fs.getDocs(fs.collection(db,'busyDates'));
+    bk.forEach(d=>booked.add(d.id));
+  } catch(e){ console.warn('Firebase load failed',e); }
+}
+
+/* availability check */
+$('#date').addEventListener('change',e=>{
+  const v=e.target.value, a=$('#avail'); if(!v){a.textContent='';return}
+  const busy=booked.has(v);
+  a.className='full '+(busy?'err':'ok');
+  a.textContent = busy ? 'Sorry, that date is already booked. Pick another or message me about a waitlist.' : 'Good news: that date looks open.';
+});
+
+/* booking submit */
+$('#bf').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f=e.target, m=$('#msg'), d=Object.fromEntries(new FormData(f));
+  m.className='';
+  if(d.website) return; // honeypot
+  if(!d.name.trim()||!/^\S+@\S+\.\S+$/.test(d.email)||!d.date){m.className='err';m.textContent='Please add your name, a valid email and the event date.';return}
+  if(booked.has(d.date)){m.className='err';m.textContent='That date is booked. Please choose another.';return}
+  delete d.website;
+  d.guests = Number(d.guests)||0; d.status='new';
+  $('#send').disabled=true;
+  try{
+    if(!db) throw new Error('no-db');
+    await fs.addDoc(fs.collection(db,'bookings'),{...d,createdAt:fs.serverTimestamp()});
+    m.className='ok';m.textContent='Request sent. I will reply within 48 hours.';f.reset();$('#avail').textContent='';
+  }catch(err){
+    const body=encodeURIComponent(Object.entries(d).map(([k,v])=>`${k}: ${v}`).join('\n'));
+    m.className='ok';m.innerHTML=`Opening your email app to send the request. Or <a href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener">message on WhatsApp</a>.`;
+    location.href=`mailto:${SITE.email}?subject=${encodeURIComponent('Booking: '+d.type+' on '+d.date)}&body=${body}`;
+  }
+  $('#send').disabled=false;
+});
+
+/* packages + process */
+const PK=[["Essential","GH₵1,500","3 hrs hosting",["Planning call","Run-of-show sheet","Basic crowd games"]],
+ ["Signature","GH₵3,000","5 hrs hosting",["Everything in Essential","Bilingual hosting","Sound system on request"]],
+ ["Premium","GH₵5,500","Full day",["Everything in Signature","Rehearsal visit","Co-host and live DJ liaison"]]];
+$('#pk').innerHTML=PK.map(([n,p,h,l],i)=>`<div class="card${i==1?' pop':''}"><h3>${n}</h3><div class="price">${p} <small>${h}</small></div><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul><button class="btn${i==1?'':' alt'}" data-pk="${n}">Choose ${n}</button></div>`).join('');
+document.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{const t=document.querySelector('[name=notes]');t.value=`Package: ${b.dataset.pk}\n`+t.value.replace(/^Package:.*\n/,'');location.hash='book'});
+$('#st').innerHTML=[["Check your date","Pick it in the calendar below."],["Send details","Tell me about the event and your vision."],["Confirm","Get a quote and pay a deposit to hold the date."],["Celebrate","I host, you enjoy the day."]].map(([t,d])=>`<div class="card"><h3>${t}</h3><p>${d}</p></div>`).join('');
+
+/* availability calendar */
+let cm=new Date();cm.setDate(1);
+const drawCal=()=>{const y=cm.getFullYear(),m=cm.getMonth(),n=new Date(y,m+1,0).getDate();
+ let h=['S','M','T','W','T','F','S'].map(d=>`<b>${d}</b>`).join('')+'<i></i>'.repeat(new Date(y,m,1).getDay());
+ for(let d=1;d<=n;d++){const k=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,bz=booked.has(k);
+  h+=`<button type="button" data-d="${k}" class="${bz?'bz':''}" ${bz||k<today?'disabled':''}>${d}</button>`}
+ $('#calt').textContent=cm.toLocaleString('en',{month:'long',year:'numeric'});$('#calg').innerHTML=h};
+$('#cp').onclick=()=>{cm.setMonth(cm.getMonth()-1);drawCal()};$('#cn').onclick=()=>{cm.setMonth(cm.getMonth()+1);drawCal()};
+$('#calg').onclick=e=>{const d=e.target.dataset.d;if(!d)return;const i=$('#date');i.value=d;i.dispatchEvent(new Event('change'));i.focus()};
+drawCal();
+
+/* newsletter */
+$('#nl').onsubmit=async e=>{e.preventDefault();const em=e.target.email.value.trim(),m=$('#nlm');
+ try{if(!db)throw 0;await fs.addDoc(fs.collection(db,'subscribers'),{email:em,createdAt:fs.serverTimestamp()});m.textContent='You are in. Thank you!';e.target.reset()}
+ catch{location.href=`mailto:${SITE.email}?subject=Subscribe&body=Please add ${encodeURIComponent(em)}`}};
+</script>
+</body>
+</html>

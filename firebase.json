@@ -1,0 +1,8 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [".firebaserc", "firebase.json", "**/.*", "**/node_modules/**", "README.md", "firestore.rules"],
+    "headers": [{ "source": "**", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }] }]
+  },
+  "firestore": { "rules": "firestore.rules" }
+}
