@@ -30,6 +30,8 @@ input:not([type=color]):not([type=file]),select,textarea{-webkit-appearance:none
 input[type=date]{min-height:42px;display:block}
 select{background:var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23b9b0d9' stroke-width='2'/></svg>") no-repeat right 10px center;padding-right:30px}
 @media(pointer:coarse){.btn,.tabs button{min-height:44px}}
+.g{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:12px}
+.bars{display:flex;gap:4px;align-items:flex-end;height:150px}.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}.bars i{display:block;width:100%;background:var(--hot);border-radius:4px 4px 0 0;min-height:2px}.bars span{font-size:.72rem}.bars small{font-size:.68rem;color:var(--mute)}
 </style></head><body>
 <div id="login"><div><h1>MC Wilber Manager</h1><p>Sign in with the Google account approved for this site.</p>
 <button class="btn" id="gi">Sign in with Google</button><div style="margin-top:14px"><button class="btn alt" id="gr">Trouble signing in? Use full-page sign-in</button></div><p id="lm" style="margin:14px 0 0;color:var(--hot)"></p></div></div>
@@ -44,12 +46,14 @@ select{background:var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {initializeAuth,indexedDBLocalPersistence,browserLocalPersistence,browserSessionPersistence,browserPopupRedirectResolver,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {getStorage,ref,uploadBytesResumable,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import {getFirestore,collection,onSnapshot,doc,updateDoc,deleteDoc,setDoc,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,onSnapshot,query,where,doc,updateDoc,deleteDoc,setDoc,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCWFhEOBfrm372DzpATu24gone0KxQ_mEE",authDomain:"mc-wilber.firebaseapp.com",projectId:"mc-wilber",storageBucket:"mc-wilber.firebasestorage.app",messagingSenderId:"1077090036961",appId:"1:1077090036961:web:f37547c21fcf98f8235ba0"});
 const auth=initializeAuth(app,{persistence:[indexedDBLocalPersistence,browserLocalPersistence,browserSessionPersistence],popupRedirectResolver:browserPopupRedirectResolver}),db=getFirestore(app),st=getStorage(app),$=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const S={bookings:[],events:[],busyDates:[],subscribers:[],site:[]};let tab='bookings',filt='all',unsubs=[];
-const NAMES={bookings:'Bookings',site:'Site content',media:'Gallery & Reels',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
+const dk=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return dk(d)};
+const S={bookings:[],events:[],busyDates:[],subscribers:[],site:[],visits:[]};let tab='bookings',filt='all',unsubs=[];
+const NAMES={bookings:'Bookings',site:'Site content',media:'Gallery & Reels',visits:'Visitors',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
 
 const pv=()=>{const p=new GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});return p};
 if(/FBAN|FBAV|Instagram|TikTok|Snapchat|Line\/|; wv\)/i.test(navigator.userAgent))$('#lm').textContent='Google sign-in does not work inside this app. Open this page in Safari or Chrome.';
@@ -64,7 +68,7 @@ onAuthStateChanged(auth,u=>{
   unsubs.forEach(f=>f());unsubs=[];
   $('#login').hidden=!!u;$('#app').hidden=!u;if(!u)return;
   $('#who').textContent=u.email;$('#err').textContent='';
-  for(const c in S)unsubs.push(onSnapshot(collection(db,c),q=>{S[c]=q.docs.map(d=>({id:d.id,...d.data()}));draw()},
+  for(const c in S)unsubs.push(onSnapshot(c=='visits'?query(collection(db,c),where('day','>=',ago(29))):collection(db,c),q=>{S[c]=q.docs.map(d=>({id:d.id,...d.data()}));draw()},
     e=>{$('#err').textContent='No access ('+e.code+'). This account is not on the manager list, or the Firestore rules are not published yet.'}));
   draw();
 });
@@ -77,6 +81,7 @@ const csv=(rows,name)=>{const k=[...new Set(rows.flatMap(Object.keys))];
 function draw(){
   $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]}${k=='site'||k=='media'?'':' ('+S[k].length+')'}</button>`).join('');
   const p=$('#panel');
+  if(tab=='visits'){visitors();return}
   if(tab=='media'){if(!$('#pm'))p.innerHTML='<div id="pm" class="card"></div>';photos();return}
   if(tab=='site'){if(!$('#sf')||!dirty)renderSite();return}
   if(tab=='bookings'){
@@ -100,6 +105,18 @@ function draw(){
   if(tab=='subscribers')p.innerHTML=`<div class="row" style="margin:0 0 14px"><button class="btn alt" data-a="csv-s">Export CSV</button></div>`+
     ([...S.subscribers].sort((a,b)=>ts(b)-ts(a)).map(s=>`<div class="item"><span>${esc(s.email)}</span><button class="btn del" data-a="del-s" data-id="${esc(s.id)}">Remove</button></div>`).join('')||'<p class="m">No subscribers yet.</p>');
 }
+function visitors(){
+ const v=S.visits,days=[...Array(14)].map((_,i)=>ago(13-i)),stat=n=>{const x=v.filter(a=>a.day>=ago(n));return[x.length,new Set(x.map(a=>a.sid)).size]};
+ const [t,tu]=stat(0),[w,wu]=stat(6),[m,mu]=stat(29);
+ const cnt=k=>Object.entries(v.reduce((o,a)=>{const n=a[k]||'unknown';o[n]=(o[n]||0)+1;return o},{})).sort((a,b)=>b[1]-a[1]).slice(0,6);
+ const per=days.map(d=>v.filter(a=>a.day==d).length),mx=Math.max(1,...per);
+ const box=(l,a,b)=>`<div class="card"><div class="m">${l}</div><div style="font-size:1.8rem;font-weight:700">${a}</div><div class="m">${b} unique</div></div>`;
+ const list=(h,k)=>`<div class="card"><h3>${h}</h3>${cnt(k).map(([n,c])=>`<div class="item"><span>${esc(n)}</span><b>${c}</b></div>`).join('')||'<p class="m">No data yet.</p>'}</div>`;
+ $('#panel').innerHTML=`<div class="g">${box('Today',t,tu)}${box('Last 7 days',w,wu)}${box('Last 30 days',m,mu)}</div>
+ <div class="card"><h3>Visits, last 14 days</h3><div class="bars">${per.map((c,i)=>`<div title="${days[i]}: ${c}"><span>${c}</span><i style="height:${Math.round(c/mx*100)}px"></i><small>${days[i].slice(8)}</small></div>`).join('')}</div></div>
+ <div class="g">${list('Where visitors come from','ref')}${list('Devices','device')}${list('Browsers','browser')}${list('Languages','lang')}</div>
+ <div class="card"><h3>Latest visits</h3>${[...v].sort((a,b)=>ts(b)-ts(a)).slice(0,25).map(a=>`<div class="item"><span>${a.createdAt?new Date(a.createdAt.seconds*1000).toLocaleString():'just now'}</span><span class="m">${esc(a.device)} · ${esc(a.browser)} · ${esc(a.ref)}</span></div>`).join('')||'<p class="m">No visits recorded yet.</p>'}</div>
+ <p class="m">One visit is counted per browsing session. Unique means different devices. No names or IP addresses are stored.</p>`}
 let dirty=false;
 const DEF={topText:'Now booking 2026 & 2027 events',heroLine:'The host who keeps your room loud, your timeline tight, and your guests talking about it for years.',badge1:'⭐ 5.0 rated',badge2:'🎉 400+ events',email:'danestitconsult@gmail.com',whatsapp:'233000000000',footerText:'Event host and emcee for weddings, corporate events, concerts and parties.',pressKit:'',
 aboutTitle:"Hi, I'm Wilber.",aboutLede:"I've held the mic at weddings, product launches, concerts and street festivals. I read the room, set the pace, and make sure every speech, song and surprise lands on time.",aboutText:'Replace this text with your own story, your years of experience, and what makes your hosting different.',

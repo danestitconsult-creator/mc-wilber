@@ -256,7 +256,8 @@ const FIREBASE = {
   projectId: "mc-wilber",
   storageBucket: "mc-wilber.firebasestorage.app",
   messagingSenderId: "1077090036961",
-  appId: "1:1077090036961:web:f37547c21fcf98f8235ba0"
+  appId: "1:1077090036961:web:f37547c21fcf98f8235ba0",
+  measurementId: "G-H8456R21J1"
 }; // paste from Firebase console
 /* ================================== */
 
@@ -304,7 +305,8 @@ if (FIREBASE.projectId) {
   try {
     const app = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    db = fs.getFirestore(app.initializeApp(FIREBASE));
+    const fa = app.initializeApp(FIREBASE); db = fs.getFirestore(fa);
+    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js').then(a=>a.getAnalytics(fa)).catch(()=>{});
     const ev = await fs.getDocs(fs.query(fs.collection(db,'events'),fs.where('date','>=',today),fs.orderBy('date')));
     drawEvents(ev.docs.map(d=>d.data()));
     const bk = await fs.getDocs(fs.collection(db,'busyDates'));
@@ -398,6 +400,16 @@ function applyContent(c,m){
  document.querySelectorAll('a[href*="wa.me/"]').forEach(a=>{a.href='https://wa.me/'+SITE.whatsapp});
 }
 if(db){try{const [c,m]=await Promise.all([fs.getDoc(fs.doc(db,'site','content')),fs.getDoc(fs.doc(db,'site','media'))]);applyContent(c.data()||{},m.data()||{})}catch(e){console.warn('content',e)}}
+
+/* anonymous visit counter (Firestore: visits) */
+if(db&&location.hostname!='localhost'){try{
+ if(!sessionStorage.getItem('v1')){
+  sessionStorage.setItem('v1','1');
+  let sid;try{sid=localStorage.getItem('sid')||crypto.randomUUID();localStorage.setItem('sid',sid)}catch{sid=String(Math.random()).slice(2)}
+  const ua=navigator.userAgent,t=new Date();
+  let ref='direct';try{if(document.referrer){const h=new URL(document.referrer).hostname.replace(/^www\./,'');if(h!=location.hostname)ref=h}}catch{}
+  await fs.addDoc(fs.collection(db,'visits'),{day:`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`,sid,ref:ref.slice(0,100),device:/iPad|Tablet/i.test(ua)?'tablet':/Mobi|iPhone|Android/i.test(ua)?'mobile':'desktop',browser:/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/CriOS|Chrome/.test(ua)?'Chrome':/FxiOS|Firefox/.test(ua)?'Firefox':/Safari/.test(ua)?'Safari':'Other',lang:(navigator.language||'').slice(0,10),createdAt:fs.serverTimestamp()});
+ }}catch(e){}}
 </script>
 </body>
 </html>

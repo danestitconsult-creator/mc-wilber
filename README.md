@@ -40,3 +40,5 @@ If the site is on a custom domain, add it under Authentication > Settings > Auth
 
 ## iPhone notes
 If Google sign-in fails on an iPhone at the GitHub Pages address, run `firebase deploy` and sign in at `https://mc-wilber.firebaseapp.com/admin` instead (same domain as Firebase Auth, so Safari allows it).
+
+- **Visitors tab:** visits today / 7 / 30 days, unique devices, 14-day chart, sources, devices, browsers, languages, latest visits. Stored anonymously in Firestore `visits`. Google Analytics (measurement ID in `FIREBASE`) also records country and city: see Firebase console > Analytics. Republish `firestore.rules`.
