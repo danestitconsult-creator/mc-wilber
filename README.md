@@ -33,3 +33,5 @@ Open `yourdomain/admin.html` (also linked in the site footer) and sign in with G
 One-time setup: Firebase console > Authentication > Sign-in method > enable **Google**. Then publish `firestore.rules`.
 To add a manager, add their Google email to the list in `isAdmin()` in `firestore.rules` and republish.
 If the site is on a custom domain, add it under Authentication > Settings > Authorized domains.
+
+- **Site content tab:** edit all text, contact details, colours, packages, services, reviews, FAQs, videos, social links, your photo and the gallery. Saved to Firestore `site/content` and `site/media`; republish `firestore.rules` once.

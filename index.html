@@ -124,7 +124,7 @@ nav ul .btn{padding:8px 20px;color:#fff}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"EntertainmentBusiness","name":"MC Wilber","description":"Event host, emcee and hype man","email":"danestitconsult@gmail.com","areaServed":"Ghana"}</script>
 </head>
 <body>
-<div class="top"><div class="wrap"><span>Now booking 2026 &amp; 2027 events</span><a href="mailto:danestitconsult@gmail.com">danestitconsult@gmail.com</a></div></div>
+<div class="top"><div class="wrap"><span data-k="topText">Now booking 2026 &amp; 2027 events</span><a href="mailto:danestitconsult@gmail.com">danestitconsult@gmail.com</a></div></div>
 <header><div class="wrap"><nav aria-label="Main">
  <a class="logo" href="#top">MC WILBER</a>
  <button id="menu" aria-expanded="false" aria-controls="links">Menu</button>
@@ -136,18 +136,18 @@ nav ul .btn{padding:8px 20px;color:#fff}
 <main id="top">
 <section class="hero" id="hero"><div class="wrap hgrid"><div>
  <h1>MC<span>Wilber</span></h1>
- <p>The host who keeps your room loud, your timeline tight, and your guests talking about it for years.</p>
+ <p data-k="heroLine">The host who keeps your room loud, your timeline tight, and your guests talking about it for years.</p>
  <div class="row"><a class="btn" href="#book">Check my date</a><a class="btn alt" href="#watch">Watch a reel</a></div>
- <div class="stats"><div><b>400+</b>events hosted</div><div><b>3</b>languages</div><div><b>48 hrs</b>reply time</div></div></div>
- <div class="hv"><div class="photo" role="img" aria-label="MC Wilber photo placeholder">🎤</div><span class="badge b1">⭐ 5.0 rated</span><span class="badge b2">🎉 400+ events</span></div>
+ <div class="stats" id="stats"><div><b>400+</b>events hosted</div><div><b>3</b>languages</div><div><b>48 hrs</b>reply time</div></div></div>
+ <div class="hv"><div class="photo" role="img" aria-label="MC Wilber photo placeholder">🎤</div><span class="badge b1" data-k="badge1">⭐ 5.0 rated</span><span class="badge b2" data-k="badge2">🎉 400+ events</span></div>
 </div></section>
 
 <section id="about"><div class="wrap about">
  <div class="photo" role="img" aria-label="Photo of MC Wilber (replace with your own)">🎤</div>
- <div><h2>Hi, I'm Wilber.</h2>
- <p class="lede">I've held the mic at weddings, product launches, concerts and street festivals. I read the room, set the pace, and make sure every speech, song and surprise lands on time.</p>
- <p>Replace this text with your own story, your years of experience, and what makes your hosting different.</p>
- <div class="tags"><span>English</span><span>Twi</span><span>Ga</span><span>Live crowd work</span><span>Own sound gear</span></div></div>
+ <div><h2 data-k="aboutTitle">Hi, I'm Wilber.</h2>
+ <p class="lede" data-k="aboutLede">I've held the mic at weddings, product launches, concerts and street festivals. I read the room, set the pace, and make sure every speech, song and surprise lands on time.</p>
+ <p data-k="aboutText">Replace this text with your own story, your years of experience, and what makes your hosting different.</p>
+ <div class="tags" id="tags"><span>English</span><span>Twi</span><span>Ga</span><span>Live crowd work</span><span>Own sound gear</span></div></div>
 </div></section>
 
 <section id="services" style="background:var(--bg2)"><div class="wrap">
@@ -208,7 +208,7 @@ nav ul .btn{padding:8px 20px;color:#fff}
 <footer><div class="wrap">
  <div class="soc" id="soc"></div>
  <div class="fcols">
-  <div><h4>MC Wilber</h4><p>Event host and emcee for weddings, corporate events, concerts and parties.</p></div>
+  <div><h4>MC Wilber</h4><p data-k="footerText">Event host and emcee for weddings, corporate events, concerts and parties.</p></div>
   <div><h4>Explore</h4><a href="#about">About</a><a href="#packages">Packages</a><a href="#watch">Watch</a><a href="#faq">FAQ</a></div>
   <div><h4>Contact</h4><a href="mailto:danestitconsult@gmail.com">danestitconsult@gmail.com</a><a href="https://wa.me/233000000000">WhatsApp</a><a href="#book">Booking form</a></div>
   <div><h4>Get event tips</h4><form id="nl" style="display:flex;padding:0;background:none;border:0"><input type="email" name="email" required placeholder="Your email" aria-label="Email"><button class="btn" style="padding:10px 18px">Join</button></form><p id="nlm" role="status" style="margin-top:6px"></p></div>
@@ -259,17 +259,20 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('#yr').textContent = new Date().getFullYear();
 
+function renderAll(){
 /* render static content */
 $('#svc').innerHTML = SITE.services.map(([t,d])=>`<div class="card"><h3>${esc(t)}</h3><p>${esc(d)}</p></div>`).join('');
 $('#typeSel').innerHTML = SITE.services.map(([t])=>`<option>${esc(t)}</option>`).join('')+'<option>Other</option>';
-$('#gal').innerHTML = SITE.gallery.map(g=>`<div aria-hidden="true">${g}</div>`).join('');
+$('#gal').innerHTML = SITE.gallery.map(g=>`<div>${g.startsWith('data:')?`<img src="${g}" alt="Event photo" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:g}</div>`).join('');
 $('#rev').innerHTML = SITE.reviews.map(([q,a])=>`<blockquote>${esc(q)}<cite>${esc(a)}</cite></blockquote>`).join('');
 $('#faqs').innerHTML = SITE.faqs.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
 $('#soc').innerHTML = SITE.socials.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('');
 $('#vids').innerHTML = SITE.videos.length ? SITE.videos.map(([id,t])=>`<button class="vid" data-id="${esc(id)}" aria-label="Play ${esc(t)}">▶ ${esc(t)}</button>`).join('')
   : '<div class="card"><p>Add YouTube IDs to <code>SITE.videos</code> in index.html to show your reels here.</p></div>';
 document.querySelectorAll('.vid').forEach(b=>b.onclick=()=>{b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1" allow="autoplay;encrypted-media;fullscreen" title="Video"></iframe>`});
-if(SITE.pressKit) $('#kit').href = SITE.pressKit; else $('#kit').onclick = e=>{e.preventDefault();location.href=`mailto:${SITE.email}?subject=Press kit request`};
+$('#kit').onclick=null; if(SITE.pressKit) $('#kit').href = SITE.pressKit; else $('#kit').onclick = e=>{e.preventDefault();location.href=`mailto:${SITE.email}?subject=Press kit request`};
+}
+renderAll();
 
 /* nav + spotlight */
 $('#menu').onclick = e=>{const o=$('#links').classList.toggle('open');e.target.setAttribute('aria-expanded',o)};
@@ -336,12 +339,16 @@ $('#bf').addEventListener('submit', async e=>{
 });
 
 /* packages + process */
-const PK=[["Essential","GH₵1,500","3 hrs hosting",["Planning call","Run-of-show sheet","Basic crowd games"]],
+let PK=[["Essential","GH₵1,500","3 hrs hosting",["Planning call","Run-of-show sheet","Basic crowd games"]],
  ["Signature","GH₵3,000","5 hrs hosting",["Everything in Essential","Bilingual hosting","Sound system on request"]],
  ["Premium","GH₵5,500","Full day",["Everything in Signature","Rehearsal visit","Co-host and live DJ liaison"]]];
-$('#pk').innerHTML=PK.map(([n,p,h,l],i)=>`<div class="card${i==1?' pop':''}"><h3>${n}</h3><div class="price">${p} <small>${h}</small></div><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul><button class="btn${i==1?'':' alt'}" data-pk="${n}">Choose ${n}</button></div>`).join('');
+let STEPS=[["Check your date","Pick it in the calendar below."],["Send details","Tell me about the event and your vision."],["Confirm","Get a quote and pay a deposit to hold the date."],["Celebrate","I host, you enjoy the day."]];
+function renderPK(){
+$('#pk').innerHTML=PK.map(([n,p,h,l],i)=>`<div class="card${i==1?' pop':''}"><h3>${esc(n)}</h3><div class="price">${esc(p)} <small>${esc(h||'')}</small></div><ul>${(l||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul><button class="btn${i==1?'':' alt'}" data-pk="${esc(n)}">Choose ${esc(n)}</button></div>`).join('');
 document.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{const t=document.querySelector('[name=notes]');t.value=`Package: ${b.dataset.pk}\n`+t.value.replace(/^Package:.*\n/,'');location.hash='book'});
-$('#st').innerHTML=[["Check your date","Pick it in the calendar below."],["Send details","Tell me about the event and your vision."],["Confirm","Get a quote and pay a deposit to hold the date."],["Celebrate","I host, you enjoy the day."]].map(([t,d])=>`<div class="card"><h3>${t}</h3><p>${d}</p></div>`).join('');
+$('#st').innerHTML=STEPS.map(([t,d])=>`<div class="card"><h3>${esc(t)}</h3><p>${esc(d||'')}</p></div>`).join('');
+}
+renderPK();
 
 /* availability calendar */
 let cm=new Date();cm.setDate(1);
@@ -358,6 +365,34 @@ drawCal();
 $('#nl').onsubmit=async e=>{e.preventDefault();const em=e.target.email.value.trim(),m=$('#nlm');
  try{if(!db)throw 0;await fs.addDoc(fs.collection(db,'subscribers'),{email:em,createdAt:fs.serverTimestamp()});m.textContent='You are in. Thank you!';e.target.reset()}
  catch{location.href=`mailto:${SITE.email}?subject=Subscribe&body=Please add ${encodeURIComponent(em)}`}};
+
+/* manager-edited content (Firestore: site/content, site/media) */
+const L=t=>String(t||'').split('\n').map(x=>x.split('|').map(y=>y.trim())).filter(a=>a[0]);
+function applyContent(c,m){
+ const root=document.documentElement.style;
+ if(c.accent)root.setProperty('--hot',c.accent);
+ if(c.accent2)root.setProperty('--gold',c.accent2);
+ if(c.email)SITE.email=c.email;
+ const wa=String(c.whatsapp||'').replace(/\D/g,'');if(wa)SITE.whatsapp=wa;
+ if(c.pressKit!==undefined)SITE.pressKit=c.pressKit;
+ if(c.services)SITE.services=L(c.services);
+ if(c.reviews)SITE.reviews=L(c.reviews);
+ if(c.faqs)SITE.faqs=L(c.faqs);
+ if(c.socials)SITE.socials=L(c.socials);
+ if(c.videos!==undefined)SITE.videos=L(c.videos);
+ if(m.gallery?.length)SITE.gallery=m.gallery;
+ renderAll();
+ if(c.packages)PK=L(c.packages).map(([n,p,h,f])=>[n,p,h,(f||'').split(';').map(x=>x.trim()).filter(Boolean)]);
+ if(c.steps)STEPS=L(c.steps);
+ renderPK();
+ if(c.stats)$('#stats').innerHTML=L(c.stats).map(([n,l])=>`<div><b>${esc(n)}</b>${esc(l||'')}</div>`).join('');
+ if(c.tags)$('#tags').innerHTML=c.tags.split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span>${esc(t)}</span>`).join('');
+ document.querySelectorAll('[data-k]').forEach(el=>{if(c[el.dataset.k])el.textContent=c[el.dataset.k]});
+ if(m.photo)document.querySelectorAll('.photo').forEach(p=>{p.textContent='';p.style.background=`url(${m.photo}) center/cover`});
+ document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(a.href.includes('?'))return;a.href='mailto:'+SITE.email;if(a.textContent.includes('@'))a.textContent=SITE.email});
+ document.querySelectorAll('a[href*="wa.me/"]').forEach(a=>{a.href='https://wa.me/'+SITE.whatsapp});
+}
+if(db){try{const [c,m]=await Promise.all([fs.getDoc(fs.doc(db,'site','content')),fs.getDoc(fs.doc(db,'site','media'))]);applyContent(c.data()||{},m.data()||{})}catch(e){console.warn('content',e)}}
 </script>
 </body>
 </html>

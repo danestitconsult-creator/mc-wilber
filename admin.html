@@ -22,6 +22,7 @@ input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);
 .tag{background:var(--gold);color:#241a00;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:700}
 .warn{color:var(--hot);font-size:.9rem}#err{color:var(--hot);margin-bottom:12px}
 .item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.sf label{display:grid;gap:4px;margin:12px 0}.sf input:not([type=color]),.sf textarea{width:100%}.sf textarea{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit}.sf h3{margin-top:26px;color:var(--gold)}.sf input[type=color]{height:42px;width:90px;padding:2px}
 </style></head><body>
 <div id="login"><div><h1>MC Wilber Manager</h1><p>Sign in with the Google account approved for this site.</p>
 <button class="btn" id="gi">Sign in with Google</button><p id="lm" style="margin:14px 0 0;color:var(--hot)"></p></div></div>
@@ -39,8 +40,8 @@ import {getFirestore,collection,onSnapshot,doc,updateDoc,deleteDoc,setDoc,addDoc
 const app=initializeApp({apiKey:"AIzaSyCWFhEOBfrm372DzpATu24gone0KxQ_mEE",authDomain:"mc-wilber.firebaseapp.com",projectId:"mc-wilber",storageBucket:"mc-wilber.firebasestorage.app",messagingSenderId:"1077090036961",appId:"1:1077090036961:web:f37547c21fcf98f8235ba0"});
 const auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const S={bookings:[],events:[],busyDates:[],subscribers:[]};let tab='bookings',filt='all',unsubs=[];
-const NAMES={bookings:'Bookings',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
+const S={bookings:[],events:[],busyDates:[],subscribers:[],site:[]};let tab='bookings',filt='all',unsubs=[];
+const NAMES={bookings:'Bookings',site:'Site content',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
 
 $('#gi').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$('#lm').textContent='Sign-in failed: '+e.code);
 $('#so').onclick=()=>signOut(auth);
@@ -59,8 +60,9 @@ const csv=(rows,name)=>{const k=[...new Set(rows.flatMap(Object.keys))];
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click()};
 
 function draw(){
-  $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]} (${S[k].length})</button>`).join('');
+  $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]}${k=='site'?'':' ('+S[k].length+')'}</button>`).join('');
   const p=$('#panel');
+  if(tab=='site'){if(!$('#sf')||!dirty)renderSite();else photos();return}
   if(tab=='bookings'){
     const list=S.bookings.filter(b=>filt=='all'||b.status==filt).sort((a,b)=>ts(b)-ts(a));
     p.innerHTML=`<div class="row" style="margin:0 0 14px"><select id="f">${['all','new','contacted','confirmed','declined'].map(o=>`<option ${o==filt?'selected':''}>${o}</option>`).join('')}</select><button class="btn alt" data-a="csv-b">Export CSV</button></div>`+
@@ -82,10 +84,40 @@ function draw(){
   if(tab=='subscribers')p.innerHTML=`<div class="row" style="margin:0 0 14px"><button class="btn alt" data-a="csv-s">Export CSV</button></div>`+
     ([...S.subscribers].sort((a,b)=>ts(b)-ts(a)).map(s=>`<div class="item"><span>${esc(s.email)}</span><button class="btn del" data-a="del-s" data-id="${esc(s.id)}">Remove</button></div>`).join('')||'<p class="m">No subscribers yet.</p>');
 }
+let dirty=false;
+const DEF={topText:'Now booking 2026 & 2027 events',heroLine:'The host who keeps your room loud, your timeline tight, and your guests talking about it for years.',badge1:'⭐ 5.0 rated',badge2:'🎉 400+ events',email:'danestitconsult@gmail.com',whatsapp:'233000000000',footerText:'Event host and emcee for weddings, corporate events, concerts and parties.',pressKit:'',
+aboutTitle:"Hi, I'm Wilber.",aboutLede:"I've held the mic at weddings, product launches, concerts and street festivals. I read the room, set the pace, and make sure every speech, song and surprise lands on time.",aboutText:'Replace this text with your own story, your years of experience, and what makes your hosting different.',
+accent:'#ff4f7b',accent2:'#ffc857',stats:'400+ | events hosted\n3 | languages\n48 hrs | reply time',tags:'English, Twi, Ga, Live crowd work, Own sound gear',
+services:'Weddings | Introductions, games, toasts and a flowing reception.\nCorporate events | Launches, galas and award nights, on script and on brand.\nConcerts & festivals | Hype, crowd control and artist handovers.\nBirthdays & parties | Energy, music requests and surprise moments.\nConferences | Panel moderation and clean transitions.\nFunerals & memorials | Calm, respectful and well-paced.',
+packages:'Essential | GH₵1,500 | 3 hrs hosting | Planning call; Run-of-show sheet; Basic crowd games\nSignature | GH₵3,000 | 5 hrs hosting | Everything in Essential; Bilingual hosting; Sound system on request\nPremium | GH₵5,500 | Full day | Everything in Signature; Rehearsal visit; Co-host and live DJ liaison',
+steps:'Check your date | Pick it in the calendar below.\nSend details | Tell me about the event and your vision.\nConfirm | Get a quote and pay a deposit to hold the date.\nCelebrate | I host, you enjoy the day.',
+reviews:'He kept 300 guests on the dance floor all night. | Ama & Kofi, wedding\nProfessional, on time, and the CEO loved him. | Events lead, fintech launch\nBest host we\'ve booked for our festival. | Festival organiser',
+faqs:'How far ahead should I book? | As early as you can. Peak months fill 3 to 6 months out.\nDo you bring sound equipment? | Yes, on request. Say so in the form and I\'ll quote it.\nDo you travel? | Yes. Travel and stay are added to the quote.\nHow do I secure my date? | A deposit after you accept the quote. Your date is held once it\'s paid.',
+videos:'',socials:'Instagram | https://instagram.com/\nYouTube | https://youtube.com/\nTikTok | https://tiktok.com/\nFacebook | https://facebook.com/\nWhatsApp | https://wa.me/233000000000'};
+const shrink=(f,w,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(f)});
+const media=()=>S.site.find(x=>x.id=='media')||{};
+function renderSite(){
+ const c={...DEF,...(S.site.find(x=>x.id=='content')||{})};
+ const T=(k,l,t='text')=>`<label>${l}<input type="${t}" name="${k}" value="${esc(c[k])}"></label>`;
+ const A=(k,l,h,r=5)=>`<label>${l}<span class="m">${h}</span><textarea name="${k}" rows="${r}">${esc(c[k])}</textarea></label>`;
+ $('#panel').innerHTML=`<form id="sf" class="sf"><p class="m">Edit anything below, then press Save. Photos have their own upload boxes at the bottom.</p>
+ <h3>Banner, headline and contact</h3>${T('topText','Top banner message')}${T('heroLine','Line under the name on the home screen')}${T('badge1','Badge 1')}${T('badge2','Badge 2')}${T('email','Booking email','email')}${T('whatsapp','WhatsApp number (country code, digits only)')}${T('pressKit','Press kit link (optional)')}${T('footerText','Footer description')}
+ <h3>About</h3>${T('aboutTitle','Heading')}${A('aboutLede','Intro paragraph','',3)}${A('aboutText','Second paragraph','',3)}${T('tags','Skill tags','text')}<span class="m">Separate tags with commas.</span>
+ <h3>Colours</h3><div class="row">${T('accent','Main colour','color')}${T('accent2','Highlight colour','color')}</div>
+ <h3>Lists</h3>${A('stats','Numbers on the home screen','One per line: Number | Label',3)}${A('services','Services','One per line: Title | Description',6)}${A('packages','Packages','One per line: Name | Price | Duration | Feature; Feature; Feature',4)}${A('steps','How booking works','One per line: Title | Description',4)}${A('reviews','Reviews','One per line: Quote | Who said it',4)}${A('faqs','Questions','One per line: Question | Answer',5)}${A('videos','Videos','One per line: YouTube video ID | Title. The ID is the text after v= in the video link.',3)}${A('socials','Social links','One per line: Name | Link',5)}
+ <div class="row"><button class="btn">Save changes</button><span id="sm"></span><button type="button" class="btn del" data-a="reset">Reset text to defaults</button></div></form><div id="pm" class="card" style="margin-top:24px"></div>`;
+ dirty=false;photos();
+}
+function photos(){const m=media();$('#pm').innerHTML=`<h3>Photos</h3><p class="m">Photos upload instantly and are shrunk automatically.</p>
+ <p style="margin-top:12px">Your photo</p>${m.photo?`<img src="${m.photo}" alt="" style="height:120px;border-radius:8px;display:block;margin:8px 0">`:''}<input type="file" accept="image/*" data-a="photo">
+ <p style="margin-top:16px">Gallery (up to 10)</p><div class="row">${(m.gallery||[]).map((g,i)=>`<div><img src="${g}" alt="" style="height:80px;border-radius:6px"><br><button class="btn del" data-a="gdel" data-id="${i}">Remove</button></div>`).join('')}</div><input type="file" accept="image/*" multiple data-a="gallery" style="margin-top:8px">`}
+document.addEventListener('input',e=>{if(e.target.closest('#sf'))dirty=true});
 const ok=async(f)=>{try{await f()}catch(e){$('#err').textContent='Action failed: '+e.code}};
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;draw();return}
   const a=e.target.dataset.a,id=e.target.dataset.id;if(!a)return;
+  if(a=='reset'&&confirm('Reset all text to the defaults?'))ok(()=>deleteDoc(doc(db,'site','content')));
+  if(a=='gdel')ok(()=>setDoc(doc(db,'site','media'),{gallery:(media().gallery||[]).filter((_,i)=>i!=id)},{merge:true}));
   if(a=='confirm')ok(async()=>{const b=S.bookings.find(x=>x.id==id);await updateDoc(doc(db,'bookings',id),{status:'confirmed'});await setDoc(doc(db,'busyDates',b.date),{booking:id})});
   if(a=='del'&&confirm('Delete this booking?'))ok(()=>deleteDoc(doc(db,'bookings',id)));
   if(a=='del-e')ok(()=>deleteDoc(doc(db,'events',id)));
@@ -95,9 +127,12 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   if(e.target.id=='f'){filt=e.target.value;draw()}
+  if(e.target.dataset.a=='photo'&&e.target.files[0])ok(async()=>setDoc(doc(db,'site','media'),{photo:await shrink(e.target.files[0],700,.8)},{merge:true}));
+  if(e.target.dataset.a=='gallery')ok(async()=>{const g=[...(media().gallery||[])];for(const f of e.target.files)if(g.length<10)g.push(await shrink(f,520,.7));await setDoc(doc(db,'site','media'),{gallery:g},{merge:true})});
   if(e.target.dataset.a=='status')ok(()=>updateDoc(doc(db,'bookings',e.target.dataset.id),{status:e.target.value}));
 });
-document.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));
+document.addEventListener('submit',e=>{e.preventDefault();
+  if(e.target.id=='sf'){ok(async()=>{await setDoc(doc(db,'site','content'),Object.fromEntries(new FormData(e.target)));dirty=false;$('#sm').textContent='Saved. Refresh the website to see it.'});return}const d=Object.fromEntries(new FormData(e.target));
   if(e.target.id=='ef')ok(()=>addDoc(collection(db,'events'),d));
   if(e.target.id=='df')ok(()=>setDoc(doc(db,'busyDates',d.date),{manual:true}));
   e.target.reset()});
