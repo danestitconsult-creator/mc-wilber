@@ -37,3 +37,6 @@ If the site is on a custom domain, add it under Authentication > Settings > Auth
 - **Site content tab:** edit all text, contact details, colours, packages, services, reviews, FAQs, videos, social links, your photo and the gallery. Saved to Firestore `site/content` and `site/media`; republish `firestore.rules` once.
 
 - **Gallery & Reels tab:** upload/remove your photo and gallery photos; add reels by pasting a YouTube link or by uploading an MP4 (needs Firebase Storage + `storage.rules`).
+
+## iPhone notes
+If Google sign-in fails on an iPhone at the GitHub Pages address, run `firebase deploy` and sign in at `https://mc-wilber.firebaseapp.com/admin` instead (same domain as Firebase Auth, so Safari allows it).
