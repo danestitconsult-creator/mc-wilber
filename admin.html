@@ -36,12 +36,13 @@ input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getStorage,ref,uploadBytesResumable,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {getFirestore,collection,onSnapshot,doc,updateDoc,deleteDoc,setDoc,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyCWFhEOBfrm372DzpATu24gone0KxQ_mEE",authDomain:"mc-wilber.firebaseapp.com",projectId:"mc-wilber",storageBucket:"mc-wilber.firebasestorage.app",messagingSenderId:"1077090036961",appId:"1:1077090036961:web:f37547c21fcf98f8235ba0"});
-const auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
+const auth=getAuth(app),db=getFirestore(app),st=getStorage(app),$=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const S={bookings:[],events:[],busyDates:[],subscribers:[],site:[]};let tab='bookings',filt='all',unsubs=[];
-const NAMES={bookings:'Bookings',site:'Site content',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
+const NAMES={bookings:'Bookings',site:'Site content',media:'Gallery & Reels',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
 
 $('#gi').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$('#lm').textContent='Sign-in failed: '+e.code);
 $('#so').onclick=()=>signOut(auth);
@@ -60,9 +61,10 @@ const csv=(rows,name)=>{const k=[...new Set(rows.flatMap(Object.keys))];
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click()};
 
 function draw(){
-  $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]}${k=='site'?'':' ('+S[k].length+')'}</button>`).join('');
+  $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]}${k=='site'||k=='media'?'':' ('+S[k].length+')'}</button>`).join('');
   const p=$('#panel');
-  if(tab=='site'){if(!$('#sf')||!dirty)renderSite();else photos();return}
+  if(tab=='media'){if(!$('#pm'))p.innerHTML='<div id="pm" class="card"></div>';photos();return}
+  if(tab=='site'){if(!$('#sf')||!dirty)renderSite();return}
   if(tab=='bookings'){
     const list=S.bookings.filter(b=>filt=='all'||b.status==filt).sort((a,b)=>ts(b)-ts(a));
     p.innerHTML=`<div class="row" style="margin:0 0 14px"><select id="f">${['all','new','contacted','confirmed','declined'].map(o=>`<option ${o==filt?'selected':''}>${o}</option>`).join('')}</select><button class="btn alt" data-a="csv-b">Export CSV</button></div>`+
@@ -104,19 +106,25 @@ function renderSite(){
  <h3>Banner, headline and contact</h3>${T('topText','Top banner message')}${T('heroLine','Line under the name on the home screen')}${T('badge1','Badge 1')}${T('badge2','Badge 2')}${T('email','Booking email','email')}${T('whatsapp','WhatsApp number (country code, digits only)')}${T('pressKit','Press kit link (optional)')}${T('footerText','Footer description')}
  <h3>About</h3>${T('aboutTitle','Heading')}${A('aboutLede','Intro paragraph','',3)}${A('aboutText','Second paragraph','',3)}${T('tags','Skill tags','text')}<span class="m">Separate tags with commas.</span>
  <h3>Colours</h3><div class="row">${T('accent','Main colour','color')}${T('accent2','Highlight colour','color')}</div>
- <h3>Lists</h3>${A('stats','Numbers on the home screen','One per line: Number | Label',3)}${A('services','Services','One per line: Title | Description',6)}${A('packages','Packages','One per line: Name | Price | Duration | Feature; Feature; Feature',4)}${A('steps','How booking works','One per line: Title | Description',4)}${A('reviews','Reviews','One per line: Quote | Who said it',4)}${A('faqs','Questions','One per line: Question | Answer',5)}${A('videos','Videos','One per line: YouTube video ID | Title. The ID is the text after v= in the video link.',3)}${A('socials','Social links','One per line: Name | Link',5)}
- <div class="row"><button class="btn">Save changes</button><span id="sm"></span><button type="button" class="btn del" data-a="reset">Reset text to defaults</button></div></form><div id="pm" class="card" style="margin-top:24px"></div>`;
- dirty=false;photos();
+ <h3>Lists</h3>${A('stats','Numbers on the home screen','One per line: Number | Label',3)}${A('services','Services','One per line: Title | Description',6)}${A('packages','Packages','One per line: Name | Price | Duration | Feature; Feature; Feature',4)}${A('steps','How booking works','One per line: Title | Description',4)}${A('reviews','Reviews','One per line: Quote | Who said it',4)}${A('faqs','Questions','One per line: Question | Answer',5)}${A('socials','Social links','One per line: Name | Link',5)}
+ <div class="row"><button class="btn">Save changes</button><span id="sm"></span><button type="button" class="btn del" data-a="reset">Reset text to defaults</button></div></form>`;
+ dirty=false;
 }
-function photos(){const m=media();$('#pm').innerHTML=`<h3>Photos</h3><p class="m">Photos upload instantly and are shrunk automatically.</p>
- <p style="margin-top:12px">Your photo</p>${m.photo?`<img src="${m.photo}" alt="" style="height:120px;border-radius:8px;display:block;margin:8px 0">`:''}<input type="file" accept="image/*" data-a="photo">
- <p style="margin-top:16px">Gallery (up to 10)</p><div class="row">${(m.gallery||[]).map((g,i)=>`<div><img src="${g}" alt="" style="height:80px;border-radius:6px"><br><button class="btn del" data-a="gdel" data-id="${i}">Remove</button></div>`).join('')}</div><input type="file" accept="image/*" multiple data-a="gallery" style="margin-top:8px">`}
+function photos(){const el=$('#pm');if(!el)return;const m=media(),rs=m.reels||[];
+ el.innerHTML=`<h3 style="color:var(--gold)">Your photo</h3><p class="m">Shown in the home and About sections.</p>${m.photo?`<img src="${m.photo}" alt="" style="height:120px;border-radius:8px;display:block;margin:8px 0">`:''}<input type="file" accept="image/*" data-a="photo">
+ <h3 style="color:var(--gold);margin-top:30px">Gallery photos (up to 10)</h3><p class="m">Pick one or more photos. They upload instantly and appear on the site gallery.</p><div class="row">${(m.gallery||[]).map((g,i)=>`<div><img src="${g}" alt="" style="height:80px;border-radius:6px"><br><button class="btn del" data-a="gdel" data-id="${i}">Remove</button></div>`).join('')||'<span class="m">No photos yet. The site shows placeholder icons until you add some.</span>'}</div><input type="file" accept="image/*" multiple data-a="gallery" style="margin-top:10px">
+ <h3 style="color:var(--gold);margin-top:30px">Reels</h3><p class="m">Paste a YouTube link (watch, youtu.be or Shorts), or a direct .mp4 link.</p>
+ <form id="rf" class="row"><input name="url" placeholder="https://youtu.be/..." required style="flex:2;min-width:200px"><input name="title" placeholder="Title" style="flex:1;min-width:140px"><button class="btn">Add reel</button></form>
+ <p class="m" style="margin-top:12px">Or upload a video file (MP4, up to 100 MB):</p><input type="file" accept="video/*" data-a="reel"> <progress id="rp" max="100" value="0" hidden></progress>
+ <div style="margin-top:14px">${rs.map((r,i)=>`<div class="item"><span><b>${esc(r.title)}</b> <span class="m">${r.type=='yt'?'YouTube':'Video file'}</span></span><button class="btn del" data-a="rdel" data-id="${i}">Remove</button></div>`).join('')||'<span class="m">No reels yet.</span>'}</div>`}
 document.addEventListener('input',e=>{if(e.target.closest('#sf'))dirty=true});
+const addReel=x=>setDoc(doc(db,'site','media'),{reels:[...(media().reels||[]),x]},{merge:true});
 const ok=async(f)=>{try{await f()}catch(e){$('#err').textContent='Action failed: '+e.code}};
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;draw();return}
   const a=e.target.dataset.a,id=e.target.dataset.id;if(!a)return;
   if(a=='reset'&&confirm('Reset all text to the defaults?'))ok(()=>deleteDoc(doc(db,'site','content')));
+  if(a=='rdel')ok(async()=>{const rs=media().reels||[],x=rs[id];if(x?.path)deleteObject(ref(st,x.path)).catch(()=>{});await setDoc(doc(db,'site','media'),{reels:rs.filter((_,i)=>i!=id)},{merge:true})});
   if(a=='gdel')ok(()=>setDoc(doc(db,'site','media'),{gallery:(media().gallery||[]).filter((_,i)=>i!=id)},{merge:true}));
   if(a=='confirm')ok(async()=>{const b=S.bookings.find(x=>x.id==id);await updateDoc(doc(db,'bookings',id),{status:'confirmed'});await setDoc(doc(db,'busyDates',b.date),{booking:id})});
   if(a=='del'&&confirm('Delete this booking?'))ok(()=>deleteDoc(doc(db,'bookings',id)));
@@ -128,10 +136,21 @@ document.addEventListener('click',e=>{
 document.addEventListener('change',e=>{
   if(e.target.id=='f'){filt=e.target.value;draw()}
   if(e.target.dataset.a=='photo'&&e.target.files[0])ok(async()=>setDoc(doc(db,'site','media'),{photo:await shrink(e.target.files[0],700,.8)},{merge:true}));
+  if(e.target.dataset.a=='reel'&&e.target.files[0]){const f=e.target.files[0];
+    if(f.size>100*1024*1024){$('#err').textContent='That video is over 100 MB. Compress it or paste a YouTube link.';return}
+    const path='reels/'+Date.now()+'-'+f.name.replace(/[^\w.-]/g,'_'),t=uploadBytesResumable(ref(st,path),f),pr=$('#rp');pr.hidden=false;$('#err').textContent='';
+    t.on('state_changed',x=>{pr.value=x.bytesTransferred/x.totalBytes*100},
+     er=>{pr.hidden=true;$('#err').textContent='Video upload failed ('+er.code+'). Firebase Storage may not be set up yet, or may need the Blaze plan. You can paste a YouTube link instead.'},
+     ()=>ok(async()=>{addReel({type:'file',url:await getDownloadURL(t.snapshot.ref),path,title:f.name.replace(/\.[^.]+$/,'')});pr.hidden=true}))}
   if(e.target.dataset.a=='gallery')ok(async()=>{const g=[...(media().gallery||[])];for(const f of e.target.files)if(g.length<10)g.push(await shrink(f,520,.7));await setDoc(doc(db,'site','media'),{gallery:g},{merge:true})});
   if(e.target.dataset.a=='status')ok(()=>updateDoc(doc(db,'bookings',e.target.dataset.id),{status:e.target.value}));
 });
 document.addEventListener('submit',e=>{e.preventDefault();
+  if(e.target.id=='rf'){const d=Object.fromEntries(new FormData(e.target)),u=d.url.trim(),y=u.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/)||u.match(/^([\w-]{11})$/);
+    if(y)ok(()=>addReel({type:'yt',id:y[1],title:d.title||'Event reel'}));
+    else if(/^https:\/\/.+\.(mp4|webm)(\?.*)?$/i.test(u))ok(()=>addReel({type:'file',url:u,title:d.title||'Event reel'}));
+    else $('#err').textContent='Paste a YouTube link or a direct .mp4 link.';
+    e.target.reset();return}
   if(e.target.id=='sf'){ok(async()=>{await setDoc(doc(db,'site','content'),Object.fromEntries(new FormData(e.target)));dirty=false;$('#sm').textContent='Saved. Refresh the website to see it.'});return}const d=Object.fromEntries(new FormData(e.target));
   if(e.target.id=='ef')ok(()=>addDoc(collection(db,'events'),d));
   if(e.target.id=='df')ok(()=>setDoc(doc(db,'busyDates',d.date),{manual:true}));

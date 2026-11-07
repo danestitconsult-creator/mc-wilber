@@ -35,3 +35,5 @@ To add a manager, add their Google email to the list in `isAdmin()` in `firestor
 If the site is on a custom domain, add it under Authentication > Settings > Authorized domains.
 
 - **Site content tab:** edit all text, contact details, colours, packages, services, reviews, FAQs, videos, social links, your photo and the gallery. Saved to Firestore `site/content` and `site/media`; republish `firestore.rules` once.
+
+- **Gallery & Reels tab:** upload/remove your photo and gallery photos; add reels by pasting a YouTube link or by uploading an MP4 (needs Firebase Storage + `storage.rules`).

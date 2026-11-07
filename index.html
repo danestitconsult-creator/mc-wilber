@@ -59,6 +59,7 @@ nav ul a:hover{color:var(--ink)}
 .ev em{color:var(--mute);font-style:normal;display:block;font-size:.93rem}
 /* video / gallery */
 .vid{aspect-ratio:16/9;border:0;border-radius:var(--r);width:100%;background:var(--bg2);display:grid;place-items:center;color:var(--ink);cursor:pointer;font-size:1rem}
+video.vid{display:block;background:#000}
 .vid iframe{width:100%;height:100%;border:0;border-radius:var(--r)}
 .gal{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 .gal div{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:2.4rem;background:var(--bg2);border:1px solid var(--line)}
@@ -267,8 +268,8 @@ $('#gal').innerHTML = SITE.gallery.map(g=>`<div>${g.startsWith('data:')?`<img sr
 $('#rev').innerHTML = SITE.reviews.map(([q,a])=>`<blockquote>${esc(q)}<cite>${esc(a)}</cite></blockquote>`).join('');
 $('#faqs').innerHTML = SITE.faqs.map(([q,a])=>`<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
 $('#soc').innerHTML = SITE.socials.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join('');
-$('#vids').innerHTML = SITE.videos.length ? SITE.videos.map(([id,t])=>`<button class="vid" data-id="${esc(id)}" aria-label="Play ${esc(t)}">▶ ${esc(t)}</button>`).join('')
-  : '<div class="card"><p>Add YouTube IDs to <code>SITE.videos</code> in index.html to show your reels here.</p></div>';
+$('#vids').innerHTML = SITE.videos.length ? SITE.videos.map(([id,t])=>id.startsWith('http')?`<div><video class="vid" controls playsinline preload="metadata" src="${esc(id)}"></video><p style="color:var(--mute)">${esc(t)}</p></div>`:`<button class="vid" style="background:linear-gradient(#0006,#0006),url(https://img.youtube.com/vi/${esc(id)}/hqdefault.jpg) center/cover" data-id="${esc(id)}" aria-label="Play ${esc(t)}">▶ ${esc(t)}</button>`).join('')
+  : '<div class="card"><p>New reels are coming soon.</p></div>';
 document.querySelectorAll('.vid').forEach(b=>b.onclick=()=>{b.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1" allow="autoplay;encrypted-media;fullscreen" title="Video"></iframe>`});
 $('#kit').onclick=null; if(SITE.pressKit) $('#kit').href = SITE.pressKit; else $('#kit').onclick = e=>{e.preventDefault();location.href=`mailto:${SITE.email}?subject=Press kit request`};
 }
@@ -381,6 +382,7 @@ function applyContent(c,m){
  if(c.socials)SITE.socials=L(c.socials);
  if(c.videos!==undefined)SITE.videos=L(c.videos);
  if(m.gallery?.length)SITE.gallery=m.gallery;
+ if(m.reels)SITE.videos=m.reels.map(x=>[x.type=='yt'?x.id:x.url,x.title||'']);
  renderAll();
  if(c.packages)PK=L(c.packages).map(([n,p,h,f])=>[n,p,h,(f||'').split(';').map(x=>x.trim()).filter(Boolean)]);
  if(c.steps)STEPS=L(c.steps);
