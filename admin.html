@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Manager | MC Wilber</title>
+<style>
+:root{--bg:#171233;--bg2:#211a47;--ink:#f6f1ff;--mute:#b9b0d9;--hot:#ff4f7b;--gold:#ffc857;--line:#3a3070}
+*{box-sizing:border-box;margin:0}body{font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:980px;margin:0 auto;padding:20px}[hidden]{display:none!important}
+button,input,select{font:inherit}
+.btn{background:var(--hot);color:#fff;border:0;border-radius:999px;padding:8px 18px;cursor:pointer;font-weight:700;text-decoration:none;display:inline-block}
+.btn.alt{background:none;border:1px solid var(--gold);color:var(--gold)}.btn.del{background:none;border:1px solid var(--hot);color:var(--hot)}
+input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px}
+#login{min-height:100vh;display:grid;place-items:center;text-align:center;padding:20px}
+#login div{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:36px;max-width:380px}
+#login h1{margin-bottom:8px}#login p{color:var(--mute);margin-bottom:20px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tabs button{background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:8px 18px;cursor:pointer}
+.tabs button.on{background:var(--gold);color:#241a00;font-weight:700}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.m{color:var(--mute);font-size:.92rem}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.tag{background:var(--gold);color:#241a00;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:700}
+.warn{color:var(--hot);font-size:.9rem}#err{color:var(--hot);margin-bottom:12px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+</style></head><body>
+<div id="login"><div><h1>MC Wilber Manager</h1><p>Sign in with the Google account approved for this site.</p>
+<button class="btn" id="gi">Sign in with Google</button><p id="lm" style="margin:14px 0 0;color:var(--hot)"></p></div></div>
+
+<div id="app" hidden><div class="wrap">
+ <div class="bar"><h2>Manager</h2><span class="m"><span id="who"></span> <button class="btn alt" id="so">Sign out</button> <a class="btn alt" href="./">View site</a></span></div>
+ <p id="err"></p>
+ <div class="tabs" id="tabs"></div><div id="panel"></div>
+</div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,onSnapshot,doc,updateDoc,deleteDoc,setDoc,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyCWFhEOBfrm372DzpATu24gone0KxQ_mEE",authDomain:"mc-wilber.firebaseapp.com",projectId:"mc-wilber",storageBucket:"mc-wilber.firebasestorage.app",messagingSenderId:"1077090036961",appId:"1:1077090036961:web:f37547c21fcf98f8235ba0"});
+const auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={bookings:[],events:[],busyDates:[],subscribers:[]};let tab='bookings',filt='all',unsubs=[];
+const NAMES={bookings:'Bookings',events:'Events',busyDates:'Blocked dates',subscribers:'Subscribers'};
+
+$('#gi').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>$('#lm').textContent='Sign-in failed: '+e.code);
+$('#so').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{
+  unsubs.forEach(f=>f());unsubs=[];
+  $('#login').hidden=!!u;$('#app').hidden=!u;if(!u)return;
+  $('#who').textContent=u.email;$('#err').textContent='';
+  for(const c in S)unsubs.push(onSnapshot(collection(db,c),q=>{S[c]=q.docs.map(d=>({id:d.id,...d.data()}));draw()},
+    e=>{$('#err').textContent='No access ('+e.code+'). This account is not on the manager list, or the Firestore rules are not published yet.'}));
+  draw();
+});
+
+const ts=b=>b.createdAt?.seconds||0;
+const csv=(rows,name)=>{const k=[...new Set(rows.flatMap(Object.keys))];
+  const t=[k,...rows.map(r=>k.map(x=>JSON.stringify(r[x]?.seconds?new Date(r[x].seconds*1000).toISOString():r[x]??'')))].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click()};
+
+function draw(){
+  $('#tabs').innerHTML=Object.keys(NAMES).map(k=>`<button data-t="${k}" class="${k==tab?'on':''}">${NAMES[k]} (${S[k].length})</button>`).join('');
+  const p=$('#panel');
+  if(tab=='bookings'){
+    const list=S.bookings.filter(b=>filt=='all'||b.status==filt).sort((a,b)=>ts(b)-ts(a));
+    p.innerHTML=`<div class="row" style="margin:0 0 14px"><select id="f">${['all','new','contacted','confirmed','declined'].map(o=>`<option ${o==filt?'selected':''}>${o}</option>`).join('')}</select><button class="btn alt" data-a="csv-b">Export CSV</button></div>`+
+    (list.map(b=>{const taken=S.busyDates.some(d=>d.id==b.date);
+      return `<div class="card"><h3><span>${esc(b.name)} <span class="tag">${esc(b.status)}</span></span><span>${esc(b.date)}</span></h3>
+      <p class="m">${esc(b.type)} · ${esc(b.guests||'?')} guests · ${esc(b.venue||'no venue')}<br>${esc(b.email)} ${esc(b.phone)}</p>
+      ${b.notes?`<p style="margin-top:8px;white-space:pre-wrap">${esc(b.notes)}</p>`:''}
+      ${taken?'<p class="warn">This date is blocked on the site.</p>':''}
+      <div class="row"><select data-a="status" data-id="${esc(b.id)}">${['new','contacted','confirmed','declined'].map(o=>`<option ${o==b.status?'selected':''}>${o}</option>`).join('')}</select>
+      <button class="btn" data-a="confirm" data-id="${esc(b.id)}">Confirm and block date</button>
+      <a class="btn alt" href="mailto:${esc(b.email)}?subject=Your MC Wilber booking for ${esc(b.date)}">Email</a>
+      ${b.phone?`<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/${esc(String(b.phone).replace(/\D/g,''))}">WhatsApp</a>`:''}
+      <button class="btn del" data-a="del" data-id="${esc(b.id)}">Delete</button></div></div>`}).join('')||'<p class="m">No bookings here yet.</p>');
+  }
+  if(tab=='events')p.innerHTML=`<div class="card"><form id="ef" class="row" style="margin:0"><input name="title" placeholder="Event title" required><input name="date" type="date" required><input name="place" placeholder="Place"><button class="btn">Add event</button></form></div>`+
+    ([...S.events].sort((a,b)=>a.date>b.date?1:-1).map(e=>`<div class="item"><span><b>${esc(e.title)}</b> <span class="m">${esc(e.date)} · ${esc(e.place)}</span></span><button class="btn del" data-a="del-e" data-id="${esc(e.id)}">Remove</button></div>`).join('')||'<p class="m">No public events.</p>');
+  if(tab=='busyDates')p.innerHTML=`<div class="card"><form id="df" class="row" style="margin:0"><input name="date" type="date" required><button class="btn">Block date</button></form><p class="m" style="margin-top:8px">Blocked dates show as taken in the site calendar and booking form.</p></div>`+
+    ([...S.busyDates].sort((a,b)=>a.id>b.id?1:-1).map(d=>`<div class="item"><b>${esc(d.id)}</b><button class="btn del" data-a="del-d" data-id="${esc(d.id)}">Unblock</button></div>`).join('')||'<p class="m">No blocked dates.</p>');
+  if(tab=='subscribers')p.innerHTML=`<div class="row" style="margin:0 0 14px"><button class="btn alt" data-a="csv-s">Export CSV</button></div>`+
+    ([...S.subscribers].sort((a,b)=>ts(b)-ts(a)).map(s=>`<div class="item"><span>${esc(s.email)}</span><button class="btn del" data-a="del-s" data-id="${esc(s.id)}">Remove</button></div>`).join('')||'<p class="m">No subscribers yet.</p>');
+}
+const ok=async(f)=>{try{await f()}catch(e){$('#err').textContent='Action failed: '+e.code}};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;draw();return}
+  const a=e.target.dataset.a,id=e.target.dataset.id;if(!a)return;
+  if(a=='confirm')ok(async()=>{const b=S.bookings.find(x=>x.id==id);await updateDoc(doc(db,'bookings',id),{status:'confirmed'});await setDoc(doc(db,'busyDates',b.date),{booking:id})});
+  if(a=='del'&&confirm('Delete this booking?'))ok(()=>deleteDoc(doc(db,'bookings',id)));
+  if(a=='del-e')ok(()=>deleteDoc(doc(db,'events',id)));
+  if(a=='del-d')ok(()=>deleteDoc(doc(db,'busyDates',id)));
+  if(a=='del-s')ok(()=>deleteDoc(doc(db,'subscribers',id)));
+  if(a=='csv-b')csv(S.bookings,'bookings.csv');if(a=='csv-s')csv(S.subscribers,'subscribers.csv');
+});
+document.addEventListener('change',e=>{
+  if(e.target.id=='f'){filt=e.target.value;draw()}
+  if(e.target.dataset.a=='status')ok(()=>updateDoc(doc(db,'bookings',e.target.dataset.id),{status:e.target.value}));
+});
+document.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));
+  if(e.target.id=='ef')ok(()=>addDoc(collection(db,'events'),d));
+  if(e.target.id=='df')ok(()=>setDoc(doc(db,'busyDates',d.date),{manual:true}));
+  e.target.reset()});
+</script></body></html>
